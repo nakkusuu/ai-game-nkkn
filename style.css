@@ -1,0 +1,51 @@
+/* Custom Styles bổ sung cho Tailwind */
+body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #E2E8F0;
+    background-image: radial-gradient(#CBD5E1 2px, transparent 2px);
+    background-size: 20px 20px;
+    color: #334155;
+    -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+.view-hidden { display: none !important; }
+
+/* Hiệu ứng mượt mà */
+.fade-in { animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Nút bấm 3D phong cách bento */
+.btn-3d {
+    transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.1s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, border-color 0.2s;
+    transform: translateY(0);
+}
+.btn-3d:active:not(:disabled) {
+    transform: translateY(6px);
+    box-shadow: 0 0px 0 rgba(0,0,0,0.08);
+}
+
+/* Option Buttons (Câu trả lời) */
+.option-btn.correct { background-color: #d1fae5; border-color: #34d399; color: #065f46; box-shadow: 0 0 20px rgba(52, 211, 153, 0.4); }
+.option-btn.wrong { background-color: #ffe4e6; border-color: #fb7185; color: #9f1239; }
+.option-btn.hidden-50 { visibility: hidden; }
+
+/* Topbar Team Card */
+.team-card { transition: all 0.3s; opacity: 1; filter: grayscale(0); }
+.team-card.active-turn { border-color: #3B82F6; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.2); transform: translateY(-5px); background-color: #eff6ff;}
+.team-card.dead { opacity: 0.5; filter: grayscale(1); }
+
+/* Animation Podium */
+.hidden-podium { opacity: 0; transform: translateY(100px); transition: all 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.show-podium { opacity: 1; transform: translateY(0); }
+
+/* Badge Độ Khó */
+.bg-easy { background-color: #10b981; } 
+.bg-medium { background-color: #f59e0b; } 
+.bg-hard { background-color: #ef4444; } 
+.bg-super { background-image: linear-gradient(to right, #8b5cf6, #ec4899); animation: pulse 2s infinite; }

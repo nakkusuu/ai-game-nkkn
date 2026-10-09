@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Đấu Trường Tin Học ☁️</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Quicksand', 'sans-serif'], cute: ['Nunito', 'sans-serif'], },
+                    colors: { bgMain: '#F8FAFC', primary: '#3B82F6', primaryHover: '#2563EB', textDark: '#334155', textMuted: '#64748B' },
+                    boxShadow: { '3d-btn': '0 6px 0 rgba(0,0,0,0.08)', '3d-btn-active': '0 0px 0 rgba(0,0,0,0.08)', 'bento': '0 10px 30px -5px rgba(59, 130, 246, 0.12)' }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-[100dvh] flex justify-center items-center sm:py-4">
+
+    <!-- MỞ RỘNG MAX-WIDTH LÊN 1600px -->
+    <div class="w-[98%] max-w-[1600px] h-[100dvh] sm:h-[98vh] bg-white sm:rounded-[2rem] sm:border-[10px] sm:border-white shadow-[0_20px_60px_rgba(51,65,85,0.12)] relative overflow-hidden flex flex-col">
+        
+        <!-- HEADER CHUNG -->
+        <header class="pt-6 pb-3 px-7 flex items-center justify-between relative z-20 bg-white/95 backdrop-blur-md border-b border-slate-100 shrink-0">
+            <div>
+                <h1 class="text-2xl font-cute font-black text-textDark flex items-center gap-2">
+                    Đấu Trường Tin Học <i class="ph-fill ph-game-controller text-primary animate-bounce"></i>
+                </h1>
+                <p id="header-subtitle" class="text-sm font-bold text-textMuted mt-0.5">THPT Nam Kỳ Khởi Nghĩa: Vui học, ẵm điểm, leo rank! 🚀</p>
+            </div>
+            <div id="host-panel" class="view-hidden flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border-2 border-slate-200">
+                <span class="font-bold text-sm text-slate-600">Lượt của:</span>
+                <select id="active-team-select" onchange="changeActiveTeam()" class="bg-white font-bold text-primary border-2 border-sky-200 rounded-xl px-3 py-1 outline-none text-base"></select>
+                <span id="difficulty-badge" class="px-4 py-1 rounded-xl font-black text-sm text-white shadow-sm">Độ khó</span>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto overflow-x-hidden relative px-7 pb-6 pt-3 flex flex-col">
+            
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="space-y-6 fade-in pb-8 max-w-[1200px] mx-auto w-full">
+                <div class="bg-sky-50 rounded-[2rem] p-6 border-2 border-sky-200 shadow-sm relative overflow-hidden mb-2">
+                    <h2 class="text-xl font-cute font-black text-sky-800 mb-2 flex items-center gap-2"><i class="ph-fill ph-book-open text-2xl"></i> Luật chơi siêu dễ</h2>
+                    <ul class="text-sm font-bold text-sky-700 space-y-2 ml-2">
+                        <li>💖 <strong>Mạng sống:</strong> Bắt đầu với 5 mạng. Sai mất 1 mạng.</li>
+                        <li>🔥 <strong>Combo Bá khí:</strong> Đúng 3 câu liên tiếp (+5%), 5 câu (+10%), 10 câu (+15%).</li>
+                        <li>🎁 <strong>Vòng Boss:</strong> Câu hỏi cuối mang theo 1 hiệu ứng ngẫu nhiên (Lucky, Bomb, Speed, Double, Health).</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 border-2 border-slate-100 rounded-[2rem] shadow-sm">
+                    <h3 class="font-cute font-black text-lg text-slate-700 mb-4 flex items-center gap-2"><i class="ph-fill ph-users-three text-xl"></i> Quản lý các đội (Tối đa 8)</h3>
+                    <div class="flex gap-3 mb-6">
+                        <input type="text" id="team-name-input" placeholder="Nhập tên đội (VD: Tổ 1)..." class="flex-1 bg-slate-50 border-2 border-slate-200 rounded-2xl px-4 py-3 font-bold text-slate-700 outline-none focus:border-primary transition-colors">
+                        <button onclick="addTeam()" class="btn-3d shadow-3d-btn bg-primary hover:bg-primaryHover text-white font-black px-8 rounded-2xl flex items-center gap-2">Thêm Đội</button>
+                    </div>
+                    <div id="team-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+                </div>
+                
+                <button onclick="startGame()" class="w-full btn-3d shadow-3d-btn bg-emerald-500 hover:bg-emerald-600 text-white font-black text-xl py-4 rounded-[2rem] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed" id="start-btn" disabled>
+                    BẮT ĐẦU TRÒ CHƠI <i class="ph-bold ph-rocket text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- MÀN HÌNH CHƠI -->
+            <div id="quiz-screen" class="view-hidden h-full flex flex-col fade-in w-full">
+                <!-- Topbar Đội chơi (Thu gọn margin/padding) -->
+                <div id="topbar" class="flex gap-3 overflow-x-auto pb-2 pt-1 shrink-0 w-full justify-center"></div>
+
+                <!-- Khu vực Câu hỏi -->
+                <div id="quiz-container" class="flex-1 flex flex-col items-center w-full max-w-[1400px] mx-auto pt-2 px-2 pb-2">
+                    
+                    <!-- Thanh thời gian thu mỏng lại -->
+                    <div class="w-full h-3 bg-slate-100 rounded-full mb-4 overflow-hidden relative shadow-inner shrink-0">
+                        <div id="timer-bar" class="h-full bg-emerald-400 w-full transition-all duration-1000 ease-linear"></div>
+                        <span id="timer-text" class="absolute inset-0 flex items-center justify-center text-[10px] font-black text-slate-700">30</span>
+                    </div>
+                    
+                    <div id="special-effect-alert" class="hidden w-full mb-3 py-2 px-4 rounded-xl font-black text-center text-lg shadow-sm animate-bounce shrink-0"></div>
+                    
+                    <!-- Hộp câu hỏi: Giảm chiều cao tối thiểu và khoảng cách dọc -->
+                    <div class="w-full bg-white border-2 border-slate-200 rounded-[1.5rem] py-6 px-8 md:py-8 mb-4 shadow-sm min-h-[120px] flex items-center justify-center text-center shrink-0">
+                        <h2 id="question-text" class="text-2xl md:text-3xl font-cute font-black text-slate-800 leading-snug">Đang tải câu hỏi...</h2>
+                    </div>
+                    
+                    <!-- Đáp án: Căn chỉnh lại khoảng cách, vừa vặn không tràn màn hình -->
+                    <div id="options-grid" class="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mb-5 shrink-0">
+                        <button class="option-btn btn-3d shadow-3d-btn bg-slate-50 border-2 border-slate-200 text-slate-700 py-4 px-6 rounded-[1.5rem] font-bold text-xl text-left hover:bg-sky-50 hover:border-sky-300 transition-colors" onclick="checkAnswer(0)">
+                            <span class="text-primary font-black mr-2">A.</span> <span id="opt-0"></span>
+                        </button>
+                        <button class="option-btn btn-3d shadow-3d-btn bg-slate-50 border-2 border-slate-200 text-slate-700 py-4 px-6 rounded-[1.5rem] font-bold text-xl text-left hover:bg-sky-50 hover:border-sky-300 transition-colors" onclick="checkAnswer(1)">
+                            <span class="text-primary font-black mr-2">B.</span> <span id="opt-1"></span>
+                        </button>
+                        <button class="option-btn btn-3d shadow-3d-btn bg-slate-50 border-2 border-slate-200 text-slate-700 py-4 px-6 rounded-[1.5rem] font-bold text-xl text-left hover:bg-sky-50 hover:border-sky-300 transition-colors" onclick="checkAnswer(2)">
+                            <span class="text-primary font-black mr-2">C.</span> <span id="opt-2"></span>
+                        </button>
+                        <button class="option-btn btn-3d shadow-3d-btn bg-slate-50 border-2 border-slate-200 text-slate-700 py-4 px-6 rounded-[1.5rem] font-bold text-xl text-left hover:bg-sky-50 hover:border-sky-300 transition-colors" onclick="checkAnswer(3)">
+                            <span class="text-primary font-black mr-2">D.</span> <span id="opt-3"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Quyền trợ giúp: Đẩy xuống sát đáy và luôn hiển thị -->
+                    <div id="lifelines-container" class="flex justify-center gap-4 mt-auto mb-2 shrink-0">
+                        <button class="lifeline-btn btn-3d shadow-3d-btn bg-amber-100 text-amber-700 hover:bg-amber-200 border-2 border-amber-300 font-bold px-6 py-3 rounded-full flex items-center gap-2 text-base disabled:opacity-30 disabled:cursor-not-allowed" id="ll-fifty" onclick="useLifeline('fifty')"><i class="ph-bold ph-mask-happy text-xl"></i> 50/50</button>
+                        <button class="lifeline-btn btn-3d shadow-3d-btn bg-sky-100 text-sky-700 hover:bg-sky-200 border-2 border-sky-300 font-bold px-6 py-3 rounded-full flex items-center gap-2 text-base disabled:opacity-30 disabled:cursor-not-allowed" id="ll-time" onclick="useLifeline('time')"><i class="ph-bold ph-clock text-xl"></i> +15s</button>
+                        <button class="lifeline-btn btn-3d shadow-3d-btn bg-rose-100 text-rose-700 hover:bg-rose-200 border-2 border-rose-300 font-bold px-6 py-3 rounded-full flex items-center gap-2 text-base disabled:opacity-30 disabled:cursor-not-allowed" id="ll-skip" onclick="useLifeline('skip')"><i class="ph-bold ph-fast-forward text-xl"></i> Bỏ qua</button>
+                        <button class="lifeline-btn btn-3d shadow-3d-btn bg-indigo-100 text-indigo-700 hover:bg-indigo-200 border-2 border-indigo-300 font-bold px-6 py-3 rounded-full flex items-center gap-2 text-base disabled:opacity-30 disabled:cursor-not-allowed" id="ll-ask" onclick="useLifeline('ask')"><i class="ph-bold ph-users text-xl"></i> Hỏi bạn</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL GIẢI THÍCH -->
+            <div id="explanation-modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-[3rem] border-[10px] border-white shadow-2xl p-8 max-w-2xl w-full text-center fade-in transform transition-all">
+                    <div id="result-icon" class="text-6xl mb-2">🎉</div>
+                    <h2 id="result-title" class="text-4xl font-cute font-black text-emerald-500 mb-2">Chính xác!</h2>
+                    <h3 id="score-earned" class="text-amber-500 font-bold text-xl mb-4"></h3>
+                    <div class="bg-slate-50 border-2 border-slate-100 p-5 rounded-2xl mb-6">
+                        <p id="explanation-text" class="text-slate-600 font-bold leading-relaxed text-lg"></p>
+                    </div>
+                    <button onclick="nextQuestion()" class="w-full btn-3d shadow-3d-btn bg-primary hover:bg-primaryHover text-white font-black text-xl py-4 rounded-[2rem] flex items-center justify-center gap-2">Câu tiếp theo <i class="ph-bold ph-arrow-right text-2xl"></i></button>
+                </div>
+            </div>
+
+            <!-- XẾP HẠNG -->
+            <div id="ranking-screen" class="view-hidden h-full flex flex-col items-center fade-in pb-12 pt-4 w-full">
+                <h1 class="text-4xl font-cute font-black text-amber-500 mb-10 flex items-center gap-3"><i class="ph-fill ph-trophy"></i> VINH DANH <i class="ph-fill ph-trophy"></i></h1>
+                
+                <div class="flex items-end justify-center h-[320px] gap-4 md:gap-8 w-full mb-12">
+                    <!-- Hạng 2 -->
+                    <div id="podium-2" class="flex flex-col items-center hidden-podium w-36 md:w-48">
+                        <div class="text-slate-700 font-black text-center mb-2 text-lg line-clamp-2" id="name-2">Đội 2</div>
+                        <div class="text-slate-500 font-bold text-sm mb-3 bg-slate-100 px-4 py-1.5 rounded-full" id="score-2">0đ</div>
+                        <div class="w-full bg-gradient-to-b from-slate-300 to-slate-400 h-[160px] rounded-t-3xl flex justify-center items-start pt-5 text-5xl font-cute font-black text-white shadow-inner">2</div>
+                    </div>
+                    <!-- Hạng 1 -->
+                    <div id="podium-1" class="flex flex-col items-center hidden-podium w-40 md:w-56">
+                        <i class="ph-fill ph-crown text-6xl text-amber-400 mb-2 drop-shadow-md animate-bounce"></i>
+                        <div class="text-amber-600 font-black text-center mb-2 text-2xl line-clamp-2" id="name-1">Đội 1</div>
+                        <div class="text-amber-700 font-bold text-lg mb-3 bg-amber-100 px-6 py-2 rounded-full" id="score-1">0đ</div>
+                        <div class="w-full bg-gradient-to-b from-amber-400 to-amber-500 h-[240px] rounded-t-3xl flex justify-center items-start pt-5 text-7xl font-cute font-black text-white shadow-inner">1</div>
+                    </div>
+                    <!-- Hạng 3 -->
+                    <div id="podium-3" class="flex flex-col items-center hidden-podium w-36 md:w-48">
+                        <div class="text-orange-800 font-black text-center mb-2 text-lg line-clamp-2" id="name-3">Đội 3</div>
+                        <div class="text-orange-700 font-bold text-sm mb-3 bg-orange-100 px-4 py-1.5 rounded-full" id="score-3">0đ</div>
+                        <div class="w-full bg-gradient-to-b from-orange-400 to-orange-600 h-[110px] rounded-t-3xl flex justify-center items-start pt-5 text-4xl font-cute font-black text-white shadow-inner">3</div>
+                    </div>
+                </div>
+                
+                <div id="other-ranks" class="hidden-podium w-full max-w-2xl bg-white border-2 border-slate-100 rounded-[3rem] p-8 shadow-sm">
+                    <h3 class="font-cute font-black text-xl text-slate-700 mb-6 text-center">Bảng phong thần</h3>
+                    <ul id="other-ranks-list" class="space-y-4"></ul>
+                </div>
+                
+                <button onclick="location.reload()" class="mt-8 btn-3d shadow-3d-btn bg-slate-800 hover:bg-slate-900 text-white font-black text-xl px-10 py-4 rounded-[2rem]">Chơi Ván Mới 🔄</button>
+            </div>
+
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
